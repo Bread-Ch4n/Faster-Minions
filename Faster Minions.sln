@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faster Minions", "Faster Minions\Faster Minions.csproj", "{4A978D49-CE55-463D-B943-56372C3BBCFE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4A978D49-CE55-463D-B943-56372C3BBCFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A978D49-CE55-463D-B943-56372C3BBCFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A978D49-CE55-463D-B943-56372C3BBCFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A978D49-CE55-463D-B943-56372C3BBCFE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
