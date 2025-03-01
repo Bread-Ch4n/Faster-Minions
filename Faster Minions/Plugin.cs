@@ -1,4 +1,5 @@
-﻿using BepInEx;
+﻿using System;
+using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -16,6 +17,8 @@ public class Plugin : BaseUnityPlugin
     private static ConfigEntry<int> _speedMultiplier;
     private static ConfigEntry<bool> _infiniteBattery;
 
+    private static Harmony _harmony;
+
     [HarmonyPatch(typeof(MinionMover))]
     class FasterMinionPatch
     {
@@ -26,16 +29,24 @@ public class Plugin : BaseUnityPlugin
             RichAI agent = (RichAI)AccessTools.Field(typeof(MinionMover), "agent").GetValue(__instance);
 
             agent.maxSpeed = value * _speedMultiplier.Value;
-            agent.acceleration = float.PositiveInfinity;;
-            agent.rotationSpeed = float.PositiveInfinity;
+            agent.acceleration = float.PositiveInfinity;
             agent.slowdownTime = float.Epsilon;
             agent.slowWhenNotFacingTarget = true;
 
             if (_infiniteBattery.Value)
             {
-                MinionUnit unit = (MinionUnit)AccessTools.Field(typeof(MinionMover), "minionUnit").GetValue(__instance);
-                FuelConsumer consumer = (FuelConsumer)AccessTools.Field(typeof(MinionUnit), "consumer").GetValue(unit);
-                consumer.CurrentFuelLevel = consumer.MaxFuelLevel;
+                try
+                {
+                    MinionUnit unit =
+                        (MinionUnit)AccessTools.Field(typeof(MinionMover), "minionUnit").GetValue(__instance);
+                    FuelConsumer consumer =
+                        (FuelConsumer)AccessTools.Field(typeof(MinionUnit), "consumer").GetValue(unit);
+                    AccessTools.Field(typeof(FuelConsumer), "currentFuelLevel").SetValue(consumer, consumer.MaxFuelLevel);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogWarning($"[Faster Minions] Error: ${e}");
+                }
             }
 
             return false;
@@ -45,8 +56,8 @@ public class Plugin : BaseUnityPlugin
     private void Awake()
     {
         _logger = Logger;
-        var h = new Harmony("faster_minions");
-        h.PatchAll();
+        _harmony = new Harmony("faster_minions");
+        _harmony.PatchAll();
 
         _speedMultiplier = Config.Bind("Faster Minions",
             "Speed_Multiplier",
@@ -59,5 +70,10 @@ public class Plugin : BaseUnityPlugin
             "Minions have infinite power.");
 
         _logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
+    }
+
+    private void OnDestroy()
+    {
+        _harmony.UnpatchSelf();
     }
 }
